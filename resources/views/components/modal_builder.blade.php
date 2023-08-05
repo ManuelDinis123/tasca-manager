@@ -104,7 +104,8 @@
                     @if (isset($select))
                         <label class="mt-1">{{ $select['configs']['label'] }}</label>
                         <select id="{{ $select['configs']['id'] }}"
-                            class="form-select {{ $select['configs']['id'] }}">
+                            class="form-select {{ $select['configs']['id'] }}"
+                            @if (isset($select['configs']['multiple'])) multiple @endif>
                             <option value="0" class="text-muted" disabled selected>
                                 {{ $select['configs']['default'] }}
                             </option>

@@ -10,13 +10,19 @@
         'hasBody' => true,
         'inputs' => [
             ['type' => 'hidden', 'id' => 'itemId'],
-            ['label' => 'Quantidade:', 'type' => 'number', 'id' => 'quantity', 'placeholder' => 'Quantidade do item', 'step' => "0.01"],
+            [
+                'label' => 'Quantidade:',
+                'type' => 'number',
+                'id' => 'quantity',
+                'placeholder' => 'Quantidade do item',
+                'step' => '0.01',
+            ],
         ],
         'select' => [
             'configs' => [
                 'id' => 'modifiersSelect',
                 'label' => 'Modificadores:',
-                'default' => 'Selecionar Modificador'                
+                'default' => 'Selecionar Modificador',
             ],
             'options' => [],
         ],
@@ -79,18 +85,23 @@
                         <i class="fa-sharp fa-regular fa-burger-soda edit-order mb-2"></i>
                     </div>
                     <hr style="color: white; opacity:1 !important;">
-                    <div class="overview-container scroll-y scrollable" style="height: 458px !important">
-                        <div class="d-flex justify-content-between overview-item mb-3">
-                            <div style="color: white">
-                                <span>2 x </span><span>Galinha Frita</span>
-                            </div>
-                            <span style="color: white">20€</span>
-                        </div>
+                    <div id="order_view" class="overview-container scroll-y scrollable" style="height: 458px !important">
+                        @if (session()->get('items') !== null)
+                            @foreach (session()->get('items') as $item)
+                                <div class="d-flex justify-content-between overview-item mb-3">
+                                    <div style="color: white">
+                                        <span>{{ $item['quantity'] }} x </span><span>{{ $item['name'] }}</span>
+                                    </div>
+                                    <span
+                                        style="color: white">{{ $item['quantity'] * $item['price'] + $item['modifier_price'] }}€</span>
+                                </div>
+                            @endforeach
+                        @endif
                     </div>
                 </div>
                 <div class="mt-3">
                     <button class="btn btn-primary w-100 mb-3" id="confirm_order">Confirmar</button>
-                    <button-btn class="btn btn-dark w-100 mb-5" id="reset">Reset</button-btn>
+                    <button-btn class="btn btn-dark w-100 mb-5" id="resetbtn">Reset</button-btn>
                     <button class="btn btn-danger w-100" id="closeSession">Fechar Sessão</button>
                 </div>
             </div>
@@ -101,7 +112,7 @@
     <script>
         var notyf = new Notyf();
 
-        $("#chooseItem").on("hidden.bs.modal", ()=>{
+        $("#chooseItem").on("hidden.bs.modal", () => {
             $(".removable-option").remove();
             $("#quantity").val("");
         })
@@ -117,7 +128,7 @@
                     "_token": "{{ csrf_token() }}",
                     "id": itemId
                 }
-            }).done((res) => {                
+            }).done((res) => {
                 $.each(res, (key, val) => {
                     $("#modifiersSelect").append(`
                         <option class="removable-option" value="${val.id}">${val.name}</option>
@@ -125,16 +136,54 @@
                 })
                 $(".loaderFADE").addClass("visually-hidden");
                 $("#chooseItem").modal("toggle");
-            }).fail((err)=>{
+            }).fail((err) => {
                 console.log(err);
                 $(".loaderFADE").addClass("visually-hidden");
             })
         })
 
-        $("#save").on('click', ()=>{
-            console.log($("#itemId").val());
-            if(hasEmpty(["quantity"])) return;
+        $("#save").on('click', () => {
+            if (hasEmpty(["quantity"])) return;
+
+            $.ajax({
+                method: "post",
+                url: "/addcart",
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "id": $("#itemId").val(),
+                    "quantity": $("#quantity").val(),
+                    "modifier": $("#modifiersSelect").val()
+                }
+            }).done((res) => {
+                notyf.success("Adicionado ao pedido");
+                $("#chooseItem").modal("toggle");
+                $("#order_view").load(" #order_view > *");
+            })
         })
+
+        $("#resetbtn").on('click', () => {
+            Swal.fire({
+                icon: "warning",
+                title: 'Quer dar reset?',
+                text: "Isto não pode ser revertido",
+                showCancelButton: true,
+                confirmButtonText: 'Confirmar',
+                confirmButtonColor: '#d33',
+                denyButtonText: `Cancelar`,
+                iconColor: '#d33'
+            }).then((result) => {
+                $.ajax({
+                    method: "post",
+                    url: "/reset",
+                    data: {
+                        "_token": "{{ csrf_token() }}"
+                    }
+                }).done((res) => {
+                    $("#order_view").load(" #order_view > *");
+                })
+            })
+        })
+
 
         $("#closeSession").on('click', () => {
             $.ajax({
