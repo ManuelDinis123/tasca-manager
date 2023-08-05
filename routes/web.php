@@ -38,3 +38,4 @@ Route::post('/deletecategory', [CategoriesController::class, 'remove'])->name("d
 // Orders
 Route::get('/pedidos', [OrdersController::class, 'index']);
 Route::post('/closesess', [OrdersController::class, 'closeSession'])->name("closesess");
+Route::post('/addcart', [OrdersController::class, 'addItem'])->name("addcart");

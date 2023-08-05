@@ -95,7 +95,8 @@
                                 <input type="{{ $input['type'] }}"
                                     @if (isset($input['placeholder'])) placeholder="{{ $input['placeholder'] }}" @endif
                                     class="form-control mb-3" id="{{ $input['id'] }}" autocomplete="off"
-                                    @if (isset($input['restrictFile'])) accept="image/*" @endif>
+                                    @if (isset($input['restrictFile'])) accept="image/*" @endif
+                                    @if (isset($input['step'])) step="{{$input['step']}}" @endif>
                             @endif
                         @endforeach
                     @endif

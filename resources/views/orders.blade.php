@@ -10,7 +10,7 @@
         'hasBody' => true,
         'inputs' => [
             ['type' => 'hidden', 'id' => 'itemId'],
-            ['label' => 'Quantidade:', 'type' => 'text', 'id' => 'quantity', 'placeholder' => 'Quantidade do item'],
+            ['label' => 'Quantidade:', 'type' => 'number', 'id' => 'quantity', 'placeholder' => 'Quantidade do item', 'step' => "0.01"],
         ],
         'select' => [
             'configs' => [
@@ -125,7 +125,15 @@
                 })
                 $(".loaderFADE").addClass("visually-hidden");
                 $("#chooseItem").modal("toggle");
+            }).fail((err)=>{
+                console.log(err);
+                $(".loaderFADE").addClass("visually-hidden");
             })
+        })
+
+        $("#save").on('click', ()=>{
+            console.log($("#itemId").val());
+            if(hasEmpty(["quantity"])) return;
         })
 
         $("#closeSession").on('click', () => {
