@@ -1,0 +1,19 @@
+{
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build"
+    },
+    "devDependencies": {
+        "axios": "^1.1.2",
+        "laravel-vite-plugin": "^0.7.5",
+        "vite": "^4.0.0"
+    },
+    "dependencies": {
+        "animate.css": "^4.1.1",
+        "datatables.net-dt": "^1.13.5",
+        "notyf": "^3.10.0",
+        "sweetalert2": "^11.7.20"
+    }
+}

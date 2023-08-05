@@ -1,0 +1,228 @@
+* {
+    font-family: "Antonio", "Trebuchet MS", "Lucida Sans Unicode",
+        "Lucida Grande", "Lucida Sans", Arial, sans-serif;
+}
+
+body {
+    background-color: #e7e7e7 !important;
+}
+
+.text-coloring {
+    color: #2b2b2b;
+}
+
+.form-label {
+    font-weight: 300;
+    color: #fff;
+}
+
+.form-control {
+    border-radius: 33.5px !important;
+    background: #fff !important;
+    box-shadow: 0px 4px 0px 0px rgba(0, 0, 0, 0.25) !important;
+}
+
+.btn {
+    border-radius: 55px !important;
+    box-shadow: 1px 8px 0px 0px rgba(0, 0, 0, 0.25) !important;
+}
+
+.btn-primary {
+    background: #27374d !important;
+    border: none !important;
+}
+
+.btn-primary:hover {
+    background-color: #1d2c3f !important;
+}
+
+.btn-dark:hover {
+    background-color: #000000 !important;
+}
+
+.btn-secondary{
+    background-color: #526D82 !important;
+}
+
+.btn-secondary:hover {
+    background-color: #4a6172 !important;
+}
+
+.form-select{
+    border-radius: 33.5px !important;
+    box-shadow: 0px 4px 0px 0px rgba(0, 0, 0, 0.25) !important;
+}
+
+.empty-warning{
+    box-shadow: 0px 4px 0px 0px rgba(167, 37, 37, 0.548) !important;
+}
+
+/* Loader */
+
+div.loaderFADE {
+    opacity: 0.5;
+    background: #000;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    top: 0;
+    left: 0;
+    position: fixed;
+}
+
+.loader-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80%;
+}
+
+.loader2 {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.897);
+    border-top-color: transparent;
+    animation: rot1 1.2s linear infinite;
+}
+
+@keyframes rot1 {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* scrollbar */
+
+.scrollable {
+    padding-bottom: 10px; /* add space between scrollbar and cards */
+    white-space: nowrap; /* prevent the items from wrapping */
+    overflow-x: scroll; /* add horizontal scrollbar when content overflows */
+}
+
+.scroll-y {
+    height: 750px;
+    overflow: auto;
+}
+
+.scrollable::-webkit-scrollbar {
+    width: 18px;
+    height: 24px;
+}
+
+.scrollable::-webkit-scrollbar-track {
+    background: #fff !important;
+    /* -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3); */
+    border-radius: 15px !important;
+}
+
+.scrollable::-webkit-scrollbar-thumb {
+    box-shadow: 0px 4px 0px 0px rgba(0, 0, 0, 0.25) !important;
+    border-radius: 15px !important;
+    background: #526d82 !important;
+}
+
+.dt-action {
+    cursor: pointer;
+    color: rgb(27, 27, 27);
+    transition: all 0.2s;
+}
+
+.dt-action:hover {
+    transform: scale(1.2);
+}
+
+.primary{
+    color: #526D82;
+}
+
+.dataTables_length {
+    display: none;
+}
+
+.dataTables_info {
+    display: none;
+}
+
+
+table.dataTable thead th {
+    border-bottom: none;
+}
+
+.current {
+    border-radius: 25px !important;
+    font-weight: 800;    
+    transition: all 0.2s;
+    outline: none !important;
+    border: none !important;
+    background: none !important;
+}
+.current:hover {
+    transform: scale(1.15);
+}
+
+.paginate_change_btns{
+    color: rgb(24, 24, 24);
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.paginate_change_btns:hover{
+    transform: scale(1.6);
+}
+
+.fa-trash-can-xmark{
+    color: rgb(187, 56, 56) !important;
+}
+
+.dataTables_filter {
+    display: none;
+}
+
+table.dataTable td {
+    font-size: 1.2em;
+}
+table.dataTable th {
+    font-size: 1.3em;
+}
+
+.admin-menu {
+    width: 200px;    
+}
+
+.active{
+    background-color: #27374d !important;
+    border: none !important;
+}
+
+
+.dataTables_filter {
+    margin-bottom: 30px;
+}
+
+table.dataTable thead tr {
+    background-color: #27374d;
+    color: white;
+}
+
+table.dataTable thead tr .h-end {
+    border-radius: 0px 15px 0px 0px;
+}
+table.dataTable thead tr .h-start {
+    border-radius: 15px 0px 0px 0px;
+}
+
+.table-container {
+    background-color: #ffffff;
+    /* padding: 25px; */
+    border-radius: 15px;
+}
+
+.dataTables_paginate {
+    margin-bottom: 10px;
+}
+
+.table {
+    margin-bottom: 30px !important;
+    /* background-color: white !important;     */
+}

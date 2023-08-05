@@ -1,0 +1,14 @@
+/* Edit page */
+
+.edit-form-container {    
+    height: 576px;
+    border-radius: 7px;
+    background: #526d82;
+    box-shadow: -7px 9px 0px 0px rgba(0, 0, 0, 0.25);
+    margin-left: 34px;
+    padding: 25px;
+}
+
+.edit-form-container h3 {
+    color: rgb(240, 240, 240);
+}
