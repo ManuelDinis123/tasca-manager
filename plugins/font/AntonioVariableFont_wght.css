@@ -1,0 +1,9 @@
+@font-face {
+    font-family: 'AntonioVariableFont_wght';
+    src: url('fonts/AntonioVariableFont_wght.eot');
+    src: url('fonts/AntonioVariableFont_wght.eot') format('embedded-opentype'),
+         url('fonts/AntonioVariableFont_wght.woff2') format('woff2'),
+         url('fonts/AntonioVariableFont_wght.woff') format('woff'),
+         url('fonts/AntonioVariableFont_wght.ttf') format('truetype'),
+         url('fonts/AntonioVariableFont_wght.svg#AntonioVariableFont_wght') format('svg');
+}

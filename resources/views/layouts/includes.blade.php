@@ -1,5 +1,5 @@
 {{-- Font --}}
-<link href="https://fonts.cdnfonts.com/css/antonio" rel="stylesheet">
+<link href="{{mix("plugins/font/AntonioVariableFont_wght.css")}}" rel="stylesheet">
 {{-- Bootstrap --}}
 <link rel="stylesheet" href="{{mix('plugins/bootstrap/css.css')}}">
 <script src="{{mix('plugins/bootstrap/js.js')}}"></script>

@@ -47,6 +47,8 @@
     border-radius: 9px;
     background: #9db2bf;
     padding: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
 .scrollable::-webkit-scrollbar {
@@ -81,4 +83,8 @@
 
 .scrollable{
     height: 754px !important;
+}
+
+.overview-item:hover{
+    transform: scale(1.05);
 }

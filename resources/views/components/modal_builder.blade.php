@@ -96,17 +96,17 @@
                                     @if (isset($input['placeholder'])) placeholder="{{ $input['placeholder'] }}" @endif
                                     class="form-control mb-3" id="{{ $input['id'] }}" autocomplete="off"
                                     @if (isset($input['restrictFile'])) accept="image/*" @endif
-                                    @if (isset($input['step'])) step="{{$input['step']}}" @endif>
+                                    @if (isset($input['step'])) step="{{ $input['step'] }}" @endif>
                             @endif
                         @endforeach
                     @endif
                     {{-- If there's a select select [Configs, Options] --}}
                     @if (isset($select))
                         <label class="mt-1">{{ $select['configs']['label'] }}</label>
-                        <select id="{{ $select['configs']['id'] }}"
-                            class="form-select {{ $select['configs']['id'] }}"
+                        <select id="{{ $select['configs']['id'] }}" class="form-select {{ $select['configs']['id'] }}"
                             @if (isset($select['configs']['multiple'])) multiple @endif>
-                            <option value="0" class="text-muted" disabled selected>
+                            <option value="0" class="text-muted" @if (!isset($select['configs']['disabled'])) disabled @endif
+                                selected>
                                 {{ $select['configs']['default'] }}
                             </option>
                             @foreach ($select['options'] as $option)
