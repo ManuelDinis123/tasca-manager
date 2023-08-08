@@ -34,7 +34,8 @@ class CategoriesController extends Controller
         if(!$data->name) return response()->json(["title" => "Erro", "message" => "Preencha todos os campos"], 400);
 
         $save = Categories::create([
-            "label"=>$data->name
+            "label"=>$data->name,
+            "color"=>$data->color,
         ]);
 
         if (!$save) return response()->json(["title" => "Erro", "message" => "Ocorreu um erro!"], 500);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Categories;
 use App\Models\Items;
 use App\Models\Modifiers;
 use App\Models\OrderItems;
@@ -19,11 +20,31 @@ class OrdersController extends Controller
     {
         if (!session()->get("sess")) return redirect("/");
 
-        // Log::info(session()->get("items"));
-
+        // Get all categories
+        $categories = Categories::get();        
         // Get all items
         $items = Items::get();
-        return View("orders")->with("items", $items);
+        return View("orders")->with("items", $items)->with("categories", $categories);
+    }
+
+    /**
+     * Filter the show items
+     * 
+     * @return items
+     */
+    function filterItems(Request $filters)
+    {
+        if (!session()->get("sess")) return redirect("/");
+
+        $items = Items::where("name", "like", "%" . $filters->search . "%");
+
+        // If category is specified filter by that also
+        if($filters->category != "all") {
+            $items->where("category_id", $filters->category);
+        }
+
+        $items = $items->get();
+        return response()->json($items);
     }
 
     /**
@@ -85,7 +106,7 @@ class OrdersController extends Controller
         $idToRemove = $id->id;
         if (isset($items[$idToRemove])) {
             unset($items[$idToRemove]);
-        }        
+        }
         session()->put("items", $items);
         return response()->json(["title" => "Sucesso", "message" => "Item removido"]);
     }

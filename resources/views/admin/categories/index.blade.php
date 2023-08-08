@@ -13,7 +13,10 @@
         'rawHeader' =>
             '<h5 class="modal-title" id="addModalLabel"><i class="fa-solid fa-circle-plus text-icon"></i> Adicionar Nova Categoria</h5>',
         'hasBody' => true,
-        'inputs' => [['label' => 'Nome:', 'type' => 'text', 'id' => 'name', 'placeholder' => 'Nome da Categoria']],
+        'inputs' => [
+            ['label' => 'Nome:', 'type' => 'text', 'id' => 'name', 'placeholder' => 'Nome da Categoria'],
+            ['label' => 'Cor:', 'type' => 'color', 'id' => 'color'],
+        ],
         'hasFooter' => true,
         'buttons' => [
             ['label' => 'Guardar', 'id' => 'save', 'class' => 'btn btn-primary'],
@@ -76,14 +79,15 @@
         })
 
         $("#save").on('click', () => {
-            if (hasEmpty(["name"])) return;
+            if (hasEmpty(["name"])) return;            
 
             $.ajax({
                 method: "post",
                 url: "/savecategories",
                 data: {
                     "_token": "{{ csrf_token() }}",
-                    "name": $("#name").val()
+                    "name": $("#name").val(),
+                    "color": $("#color").val(),
                 }
             }).done((res) => {
                 notyf.success(res.message);

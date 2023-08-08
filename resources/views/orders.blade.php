@@ -42,8 +42,55 @@
     ])
     @endcomponent
 
-    <title>
-        Pedidos</title>
+    @php
+        // Create html for buttons for each category with their respective colors
+        $categoryBtns = "<button id='cball' class='categorybuttons btn btn-primary w-100 mb-4 cbtn'>Todos</button>";
+        foreach ($categories as $key => $value) {
+            $categoryBtns .=
+                "
+            <style>
+                .cbtn" .
+                $value['id'] .
+                "{
+                    background: " .
+                $value['color'] .
+                " !important;
+                    color:white;
+                    transition: 0.2s all;
+                }
+                .cbtn" .
+                $value['id'] .
+                ":hover{
+                    background: " .
+                $value['color'] .
+                " !important;
+                    color:white;
+                    transform: scale(1.02);
+                }
+            </style>
+            <button id='cb" .
+                $value['id'] .
+                "' class='categorybuttons btn cbtn" .
+                $value['id'] .
+                " w-100 mb-4'>" .
+                $value['label'] .
+                "</button>
+            ";
+        }
+    @endphp
+    @component('components.modal_builder', [
+        'modal_id' => 'filterCategories',
+        'hasHeader' => true,
+        'rawHeader' =>
+            '<h5 class="modal-title" id="addModalLabel"><i class="fa-sharp fa-solid fa-filters text-icon"></i> Filtrar por categoria</h5>',
+        'hasBody' => true,
+        'rawBody' => '<div>' . $categoryBtns . '</div>',
+        'hasFooter' => true,
+        'buttons' => [['label' => 'Fechar', 'id' => 'closeMdl', 'class' => 'btn btn-danger', 'dismiss' => true]],
+    ])
+    @endcomponent
+
+    <title>Pedidos</title>
     <link rel="stylesheet" href="{{ mix('resources/css/orders.css') }}">
 
     <input type="hidden" id="edit_id">
@@ -54,6 +101,8 @@
         </div>
     </div>
 
+    <input type="hidden" id="categoryHidden" value="all">
+
     <div class="container mt-5">
         <div class="d-flex flex-row">
             <div class="w-100">
@@ -61,6 +110,12 @@
                     <h1 style="font-weight: 800">{{ session()->get('sess.label') }}</h1>
                     <input id="search_items" type="text" class="form-control w-50" style="height: 50px"
                         placeholder="Procurar">
+                    <div class="stats-btn" data-bs-toggle="modal" data-bs-target="#filterCategories">
+                        <div class="d-flex justify-content-center">
+                            <i class="fa-sharp fa-solid fa-filters stats-icon"></i>
+                        </div>
+                        <span class="stats-lbl">Categorias</span>
+                    </div>
                     <div class="stats-btn">
                         <div class="d-flex justify-content-center">
                             <i class="fa-solid fa-chart-simple stats-icon"></i><br />
@@ -79,7 +134,7 @@
                                     background-position: center;
                                 }
                             </style>
-                            <div class="item item-{{ $item['id'] }}">
+                            <div class="item item-{{ $item['id'] }}" onclick="itemOpen({{ $item['id'] }})">
                                 <div class="item-content">
                                     <span class="item-text">{{ $item['name'] }}</span>
                                     <span class="item-text">{{ $item['price'] }}€</span>
@@ -102,7 +157,8 @@
                         @endphp
                         @if (session()->get('items') !== null)
                             @foreach (session()->get('items') as $key => $item)
-                                <div id="item{{ $key }}" onclick="overviewItemOpen({{$key}})" oncontextmenu="deleteItem({{$key}}); return false;"
+                                <div id="item{{ $key }}" onclick="overviewItemOpen({{ $key }})"
+                                    oncontextmenu="deleteItem({{ $key }}); return false;"
                                     class="d-flex justify-content-between overview-item mb-3 itm-{{ $item['id'] }}">
                                     <div style="color: white;">
                                         <span>{{ $item['quantity'] }} x </span><span>{{ $item['name'] }}
@@ -120,7 +176,6 @@
                                 @endphp
                             @endforeach
                         @endif
-                        <script></script>
                     </div>
                     <div id="order_total" class="d-flex align-items-end justify-content-end">
                         <span style="font-size: 26px; font-weight:800; color:white;">{{ $total_price }}€</span>
@@ -141,11 +196,54 @@
 
         // Filtering
 
-        $("#search_items").on("keydown", function(event){
-            if(event.keyCode == 13){
-                
+        $(".categorybuttons").on('click', function() {
+            var cId = this.id.replace("cb", "");
+            $("#categoryHidden").val(cId);
+            filteringItems();
+        })
+
+        $("#search_items").on("keydown", function(event) {
+            if (event.keyCode == 13) {
+                filteringItems();
             }
         })
+
+        function filteringItems() {
+            $(".loaderFADE").removeClass("visually-hidden");
+            $.ajax({
+                method: "post",
+                url: "/filteritems",
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "search": $("#search_items").val(),
+                    "category": $("#categoryHidden").val(),
+                }
+            }).done((res) => {
+                $(".items-container div").remove();
+                $(".items-container style").remove();
+                $.each(res, (key, val) => {
+                    $(".items-container").append(`
+                            <style>
+                                .item-${val.id} {
+                                    background: linear-gradient(180deg, rgba(0, 0, 0, 0.00) 46.88%, rgba(0, 0, 0, 0.78) 100%), url(${val.img});
+                                    background-size: cover;
+                                    background-position: center;
+                                }
+                            </style>
+                            <div class="item item-${val.id}" onclick="itemOpen(${val.id})">
+                                <div class="item-content">
+                                    <span class="item-text">${val.name}</span>
+                                    <span class="item-text">${val.price}€</span>
+                                </div>
+                            </div>
+                        `);
+                })
+                $(".loaderFADE").addClass("visually-hidden");
+            }).fail((err)=>{
+                console.error(err);
+                $(".loaderFADE").removeClass("visually-hidden");
+            })
+        }
 
         // Order system
 
@@ -158,12 +256,11 @@
             $("#modifiersSelect").removeAttr("disabled", "false");
         })
 
-        $(".item").on('click', function() {
+        function itemOpen(itemId) {
             $(".loaderFADE").removeClass("visually-hidden");
-            var itemId = this.className.replace("item item-", "");
             $("#itemId").val(itemId);
             gettingModifiers(itemId);
-        })
+        }
 
         $("#save").on('click', () => {
             if (hasEmpty(["quantity"])) return;
@@ -213,24 +310,24 @@
             })
         })
 
-        function deleteItem(id){
+        function deleteItem(id) {
             $(".loaderFADE").removeClass("visually-hidden");
             $.ajax({
                 method: "post",
                 url: "/removeoverviewitem",
                 data: {
-                    "_token": "{{csrf_token()}}",
+                    "_token": "{{ csrf_token() }}",
                     "id": id
                 }
-            }).done((res)=>{
+            }).done((res) => {
                 notyf.success(res.message);
                 $("#order_view").load(" #order_view > *");
                 $("#order_total").load(" #order_total > *");
                 $(".loaderFADE").addClass("visually-hidden");
-            }).fail((err)=>{
+            }).fail((err) => {
                 $(".loaderFADE").addClass("visually-hidden");
                 console.error(err);
-            })            
+            })
         }
 
         function overviewItemOpen(id) {
