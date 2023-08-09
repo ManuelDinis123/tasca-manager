@@ -35,7 +35,7 @@
                 <button onclick="window.location.href = '/items'" id="see_stats"
                     style="height: 70px; font-size: 25px; margin-top: 90px !important;"
                     class="btn btn-primary w-100 mt-5">Configurações</button>
-                <button id="see_stats" style="height: 70px; font-size: 25px;" class="btn btn-dark w-100 mt-4">Estatísticas
+                <button onclick="window.location.href = '/estatisticas/all?from=home'" id="see_stats" style="height: 70px; font-size: 25px;" class="btn btn-dark w-100 mt-4">Estatísticas
                     Gerais</button>
             </div>
             <div class="right-side" style="width: 60%;">

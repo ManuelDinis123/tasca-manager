@@ -7,8 +7,11 @@
 
     <div class="container mt-5">
         {{-- Breadcrumbs --}}
+        @php
+            $breadc_title = $ss != 'NO_SESSION' ? 'Estatísticas de ' . $ss['label'] : 'Estatísticas Gerais';
+        @endphp
         @component('components.breadcrumbs', [
-            'title' => 'Estatísticas de ' . $ss['label'],
+            'title' => $breadc_title,
             'crumbs' => [
                 [
                     'link' => isset($_GET['from']) ? ($_GET['from'] == 'home' ? '/' : '/pedidos') : '/',
@@ -85,16 +88,112 @@
             </div>
         </div>
 
+        {{-- Per session (only when viewing global stats) --}}
+        <input type="hidden" id="isGlobal" value="{{ $ss == 'NO_SESSION' ? 'true' : 'false' }}">
+        @if ($ss == 'NO_SESSION')
+            <div class="d-flex justify-content-center mt-5">
+                <h1 style="font-weight: 800">Vendas por Sessão</h1>
+            </div>
+            <input type="hidden" id="per_session_data" value="{{ json_encode($per_session) }}">
+            <div class="stat-container" style="height: 1390px">
+                <div id="session_chart" class="barChart-contain">
+                    <canvas id="sessionChart"></canvas>
+                </div>
+                <div id="count_session_chart" class="barChart-contain mt-4">
+                    <canvas id="countSessionChart"></canvas>
+                </div>
+            </div>
+        @endif
+
         {{-- Total --}}
         <div class="ttl-container mt-5">
             <div class="d-flex justify-content-center align-items-center">
-                <h2 style="font-weight: 750">Total de pedidos:</h2><h1 class="ms-3" style="font-weight: 900">{{$total}}</h1>
+                <h2 style="font-weight: 750">Total de pedidos:</h2>
+                <h1 class="ms-3" style="font-weight: 900">{{ $total }}</h1>
             </div>
         </div>
 
     </div>
 
     <script>
+        // Estatisticas gerais
+        if ($("#isGlobal").val() == "true") {
+            const perSession = JSON.parse($("#per_session_data").val());
+            // Prepare array for dataset
+            var sessionDataSet = {
+                "labels": [],
+                "sales": [],
+                "bruto": [],
+                "despesas": [],
+                "orders_count": [],
+                "color": [],
+            };
+            $.each(perSession, (key, value) => {
+                sessionDataSet['labels'][key] = value.label;
+                sessionDataSet['sales'][key] = value.liquido;
+                sessionDataSet['bruto'][key] = value.bruto;
+                sessionDataSet['despesas'][key] = value.despesas;
+                sessionDataSet['orders_count'][key] = value.orders_count;
+                sessionDataSet['color'][key] = addAlpha("#1d2c3f", 0.8);
+            })
+
+            const session_chart = document.getElementById('sessionChart');
+
+
+            new Chart(session_chart, {
+                type: 'line',
+                data: {
+                    labels: sessionDataSet.labels,
+                    datasets: [{
+                            label: 'Liquido',
+                            data: sessionDataSet.sales,
+                            tension: 0.1,
+                            fill: false,
+                            borderColor: '#3b9119',
+                        },
+                        {
+                            label: 'Bruto',
+                            data: sessionDataSet.bruto,
+                            tension: 0.1,
+                            fill: false,
+                            borderColor: '#5482cc',
+                        },
+                        {
+                            label: 'Despesas',
+                            data: sessionDataSet.despesas,
+                            tension: 0.1,
+                            fill: false,
+                            borderColor: '#cf3232',
+                        },
+                    ]
+                }
+            });
+
+            Chart.defaults.global.defaultFontColor = "#000";
+
+            const csc = document.getElementById('countSessionChart');
+
+            new Chart(csc, {
+                type: 'bar',
+                data: {
+                    labels: sessionDataSet.labels,
+                    datasets: [{
+                        label: 'Numero de Pedidos por Sessão',
+                        data: sessionDataSet.orders_count,
+                        backgroundColor: sessionDataSet.color,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
         // Estatistica financeira 
         Chart.defaults.global.defaultFontColor = "#000";
 
@@ -205,7 +304,7 @@
 
 
         // Per Items
-        const salesPerItems = JSON.parse($("#item_sales_data").val());        
+        const salesPerItems = JSON.parse($("#item_sales_data").val());
         // Prepare array for dataset
         var itemsDataSets = {
             "labels": [],

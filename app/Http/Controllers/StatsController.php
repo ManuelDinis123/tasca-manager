@@ -19,7 +19,10 @@ class StatsController extends Controller
      */
     function index(Request $params)
     {
-        $ss = Sessions::whereId($params->route('id'))->get()->first();
+
+        if ($params->route('id') != "all") {
+            $ss = Sessions::whereId($params->route('id'))->get()->first();
+        }
 
         // Financial Stats
         $money_stats = Orders::selectRaw(
@@ -30,8 +33,18 @@ class StatsController extends Controller
             ')
         )
             ->join("order_items", "order_items.order_id", "=", "orders.id")
-            ->leftJoin("order_items_modifiers", "order_items_modifiers.order_item_id", "=", "order_items.id")
-            ->where("orders.session_id", $ss['id'])->get()->first();
+            ->leftJoin("order_items_modifiers", "order_items_modifiers.order_item_id", "=", "order_items.id");
+
+        if (isset($ss)) {
+            $money_stats->where("orders.session_id", $ss['id']);
+        }
+
+        $money_stats = $money_stats->get()->first();
+
+        $sales_per_category_where = '';
+        if (isset($ss)) {
+            $sales_per_category_where = 'WHERE orders.session_id = ' . $ss['id'];
+        }
 
         // Sales per Category (quantity of sales)
         $sales_per_category = Categories::select(
@@ -46,7 +59,7 @@ class StatsController extends Controller
                 DB::raw('(SELECT order_items.item_id, SUM(order_items.quantity) AS quantity
                        FROM order_items
                        INNER JOIN orders ON orders.id = order_items.order_id
-                       WHERE orders.session_id = ' . $ss['id'] . ' GROUP BY order_items.item_id) AS order_items'),
+                       ' . $sales_per_category_where . ' GROUP BY order_items.item_id) AS order_items'),
                 'items.id',
                 '=',
                 'order_items.item_id'
@@ -62,15 +75,19 @@ class StatsController extends Controller
             ->leftJoin("items", "items.category_id", "=", "categories.id")
             ->leftJoin("order_items", "order_items.item_id", "=", "items.id")
             ->leftJoin("orders", "orders.id", "=", "order_items.order_id")
-            ->leftJoin("order_items_modifiers", "order_items_modifiers.order_item_id", "=", "order_items.id")
-            ->where("orders.session_id", $ss['id'])
-            ->groupBy("categories.id")
-            ->get();
+            ->leftJoin("order_items_modifiers", "order_items_modifiers.order_item_id", "=", "order_items.id");
+
+
+        if (isset($ss)) {
+            $sales_per_category_2->where("orders.session_id", $ss['id']);
+        }
+
+        $sales_per_category_2 = $sales_per_category_2->groupBy("categories.id")->get();
 
         // Merge the two sales per category arrays
-        foreach($sales_per_category as $key=>$val){
-            foreach($sales_per_category_2 as $key2=>$val2){                
-                if($val["id"]==$val2['id']){
+        foreach ($sales_per_category as $key => $val) {
+            foreach ($sales_per_category_2 as $key2 => $val2) {
+                if ($val["id"] == $val2['id']) {
                     $sales_per_category[$key]['lucro'] = $val2['lucro'];
                 }
             }
@@ -84,28 +101,53 @@ class StatsController extends Controller
             DB::raw("sum(order_items.quantity) as total"),
             DB::raw("ROUND(( SUM((order_items.quantity*order_items.price_snapshot)) + ifnull(SUM((order_items_modifiers.quantity*order_items_modifiers.price_snapshot) ),0))) -  (SUM((order_items.quantity*order_items.cost_snapshot))+ ifnull(SUM((order_items_modifiers.quantity*order_items_modifiers.cost_snapshot)),0)  ) as lucro"),
         )
-        ->join("categories", "categories.id", "=", "items.category_id")
-        ->leftJoin("order_items", "order_items.item_id", "=", "items.id")
-        ->leftJoin("orders", "orders.id", "=", "order_items.order_id")
-        ->leftJoin("order_items_modifiers", "order_items_modifiers.order_item_id", "=", "order_items.id")
-        ->where("orders.session_id", $ss['id'])
-        ->groupBy("items.id")
-        ->orderBy("total", "DESC")
-        ->get();
-        
+            ->join("categories", "categories.id", "=", "items.category_id")
+            ->leftJoin("order_items", "order_items.item_id", "=", "items.id")
+            ->leftJoin("orders", "orders.id", "=", "order_items.order_id")
+            ->leftJoin("order_items_modifiers", "order_items_modifiers.order_item_id", "=", "order_items.id");
+
+        if (isset($ss)) {
+            $sales_per_item->where("orders.session_id", $ss['id']);
+        }
+
+        $sales_per_item = $sales_per_item->groupBy("items.id")
+            ->orderBy("total", "DESC")
+            ->get();
+
         // Total orders
         $total_orders = Orders::select(
             DB::raw("count(id) as total")
-        )
-        ->where("orders.session_id", $ss['id'])
-        ->get()->first();
-        
+        );
+
+        if (isset($ss)) {
+            $total_orders->where("orders.session_id", $ss['id']);
+        }
+
+        $total_orders = $total_orders->get()->first();
+
+        // per session
+        $per_session=null;
+        if ($params->route('id') == "all") {
+            $per_session = Sessions::select(
+                "sessions.label",
+                DB::raw('COUNT(orders.id) as orders_count'),
+                DB::raw('ROUND(SUM((order_items.quantity*order_items.price_snapshot))+SUM((order_items_modifiers.quantity*order_items_modifiers.price_snapshot)), 2) as bruto'),
+                DB::raw('ROUND(SUM((order_items.quantity*order_items.cost_snapshot))+SUM((order_items_modifiers.quantity*order_items_modifiers.cost_snapshot)), 2) as despesas'),
+                DB::raw('ROUND((SUM((order_items.quantity*order_items.price_snapshot))+SUM((order_items_modifiers.quantity*order_items_modifiers.price_snapshot)))-(SUM((order_items.quantity*order_items.cost_snapshot))+SUM((order_items_modifiers.quantity*order_items_modifiers.cost_snapshot))), 2) as liquido')
+            )
+                ->join('orders', 'orders.session_id', '=', 'sessions.id')
+                ->join('order_items', 'order_items.order_id', '=', 'orders.id')
+                ->leftJoin('order_items_modifiers', 'order_items_modifiers.order_item_id', '=', 'order_items.id')
+                ->groupBy('sessions.id')
+                ->get();
+        }                
 
         return view("statistics.index")
-            ->with("ss", $ss)
+            ->with("ss", (isset($ss) ? $ss : "NO_SESSION"))
             ->with("money_stats", $money_stats)
             ->with("category_sales", $sales_per_category)
             ->with("item_sales", $sales_per_item)
-            ->with("total", $total_orders->total);
+            ->with("total", $total_orders->total)
+            ->with("per_session", $per_session);
     }
 }
