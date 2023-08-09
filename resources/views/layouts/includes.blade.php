@@ -19,6 +19,8 @@
 {{-- Swal --}}
 <link rel="stylesheet" href="{{ mix('node_modules/sweetalert2/dist/sweetalert2.min.css') }}"></link>
 <script src="{{ mix('node_modules/sweetalert2/dist/sweetalert2.min.js') }}"></script>
+{{-- Chart.js --}}
+<script src="{{ mix('plugins/chartjs/chart.js') }}"></script>
 
 {{-- ! Stuff that should always be the last to be included --}}
 

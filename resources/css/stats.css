@@ -1,0 +1,34 @@
+.stat-container {
+    border-radius: 31px;
+    background: #526D82;
+    padding: 15px;
+}
+
+.money-info {
+    padding: 5px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0px 4px 0px 0px rgba(0, 0, 0, 0.25);
+}
+
+.money-info span {
+    font-size: 35px;
+}
+
+.stats-money-val{
+    font-weight: 800;
+}
+
+.barChart-contain{
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+}
+
+.ttl-container{
+    padding: 58px 5px;
+    border-radius: 16px;
+    background: white;
+    box-shadow: 0px 4px 0px 0px rgba(0, 0, 0, 0.25);
+    color: #0e0e0ec9;
+}

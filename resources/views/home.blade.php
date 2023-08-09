@@ -47,7 +47,7 @@
                         class="scrollable d-flex flex-column justify-contents-center">
                         {{-- From DB --}}
                         @foreach ($sess as $session)
-                            <div class="session">
+                            <div class="session" onclick="window.location.href = '/estatisticas/'+{{$session['id']}}+'?from=home'">
                                 <div class="d-flex justify-content-between">
                                     <h3 style="color: white; font-weight: 700; margin-top: 7px;">{{$session['label']}}</h3>
                                     <h3 style="color: white; font-weight: 300; margin-top: 7px;">{{date("d/m/Y", strtotime($session['start']))}}</h3>

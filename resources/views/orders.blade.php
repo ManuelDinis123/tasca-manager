@@ -116,7 +116,7 @@
                         </div>
                         <span class="stats-lbl">Categorias</span>
                     </div>
-                    <div class="stats-btn">
+                    <div class="stats-btn" onclick="window.location.href = '/estatisticas/'+{{session()->get('sess.id')}}+'?from=orders'">
                         <div class="d-flex justify-content-center">
                             <i class="fa-solid fa-chart-simple stats-icon"></i><br />
                         </div>
@@ -254,6 +254,7 @@
             $("#modifiersSelect").val(null);
             $("#quantityMod").removeAttr("disabled");
             $("#modifiersSelect").removeAttr("disabled", "false");
+            $("#edit_id").val(null);
         })
 
         function itemOpen(itemId) {
